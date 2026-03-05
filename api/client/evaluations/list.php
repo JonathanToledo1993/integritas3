@@ -9,16 +9,25 @@ $clientData = AuthMiddleware::requireClient();
 $companyId = $clientData['companyId'];
 
 try {
+    // Columnas reales según schema Prisma:
+    // e.id, e.companyId, e.creatorId, e.cargo, e.profileKey, e.language,
+    // e.confidential, e.archived, e.expiresAt, e.createdAt, e.updatedAt
     $sql = "
         SELECT 
-            e.id, e.cargo, e.isConfidential, e.expiresAt, e.status, e.createdAt, e.updatedAt,
-            p.name as profileName,
-            u.name as creatorFirst, u.lastName as creatorLast,
+            e.id,
+            e.cargo,
+            e.profileKey,
+            e.language,
+            e.confidential,
+            e.archived,
+            e.expiresAt,
+            e.createdAt,
+            e.updatedAt,
+            u.name as creatorName,
             (SELECT COUNT(*) FROM evaluation_candidates ec WHERE ec.evaluationId = e.id) as totalCandidates,
-            (SELECT COUNT(*) FROM evaluation_candidates ec WHERE ec.evaluationId = e.id AND ec.status IN ('COMPLETED')) as finishedCandidates
+            (SELECT COUNT(*) FROM evaluation_candidates ec WHERE ec.evaluationId = e.id AND ec.status = 'COMPLETED') as finishedCandidates
         FROM evaluations e
-        LEFT JOIN profiles p ON e.profileId = p.id
-        LEFT JOIN users u ON e.userId = u.id
+        LEFT JOIN users u ON e.creatorId = u.id
         WHERE e.companyId = ?
         ORDER BY e.createdAt DESC
     ";
@@ -33,6 +42,6 @@ try {
 
 }
 catch (Exception $e) {
-    Responder::error("Error obteniendo evaluaciones.", 500);
+    Responder::error("Error obteniendo evaluaciones: " . $e->getMessage(), 500);
 }
 ?>

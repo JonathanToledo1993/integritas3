@@ -158,16 +158,21 @@
 
                 <!-- Evaluaciones Tools Nav -->
                 <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
-                    <div class="flex items-center gap-2 bg-gray-100 p-1 rounded-full">
-                        <button
-                            class="px-5 py-2 text-sm font-bold bg-black text-white rounded-full shadow-sm">Activas</button>
-                        <button
-                            class="px-5 py-2 text-sm font-bold text-gray-600 hover:text-black hover:bg-white rounded-full transition-colors">Archivadas</button>
+                    <div class="flex items-center bg-gray-100 p-1 rounded-full gap-1">
+                        <button id="tabActivas" onclick="switchTab('activas')"
+                            class="px-6 py-2.5 text-sm font-bold rounded-full transition-all bg-black text-white shadow-sm">
+                            Activas
+                        </button>
+                        <button id="tabArchivadas" onclick="switchTab('archivadas')"
+                            class="px-6 py-2.5 text-sm font-bold text-gray-500 rounded-full transition-all hover:bg-gray-200">
+                            Archivadas
+                        </button>
                     </div>
 
                     <div class="relative w-full md:w-80">
                         <i class="ph ph-magnifying-glass absolute left-4 top-3 text-gray-400"></i>
-                        <input type="text" placeholder="Buscar por nombre, creador o código"
+                        <input type="text" id="searchInput" placeholder="Buscar por nombre, creador o código"
+                            oninput="filterTable()"
                             class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-full focus:outline-none focus:ring-1 focus:ring-black placeholder-gray-400 bg-white">
                     </div>
                 </div>
@@ -329,7 +334,12 @@
                 });
                 const data = await res.json();
                 if (data.status === 'success' || data.success) {
-                    renderEvaluations(data.data.evaluations);
+                    // Store all evaluations for tab filtering
+                    allEvaluations = data.data.evaluations || [];
+                    // Show only current tab's evaluations
+                    // MySQL returns TINYINT as string '0'/'1', use parseInt
+                    const filtered = allEvaluations.filter(e => currentTab === 'activas' ? parseInt(e.archived) !== 1 : parseInt(e.archived) === 1);
+                    renderEvaluations(filtered);
                 } else if (res.status === 401) {
                     logout();
                 } else {
@@ -370,11 +380,11 @@
                 }
 
                 html += `
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="py-5 pl-6 pr-3 text-sm font-semibold text-gray-700">${e.id}</td>
+                <tr class="hover:bg-gray-50 transition-colors" data-cargo="${e.cargo.toLowerCase()}" data-creator="${(e.creatorName || '').toLowerCase()}" data-id="${e.id.toLowerCase()}">
+                    <td class="py-5 pl-6 pr-3 text-xs font-mono font-semibold text-gray-400">${e.id}</td>
                     <td class="px-3 py-5 text-sm">
-                        <div class="font-bold text-gray-900 text-base mb-0.5" title="${e.profileName}">${e.cargo}</div>
-                        <div class="text-xs text-gray-500 flex items-center gap-1"><i class="ph ph-user text-gray-400"></i> ${e.creatorFirst} ${e.creatorLast}</div>
+                        <div class="font-bold text-gray-900 text-base mb-0.5" title="${e.profileKey}">${e.cargo}</div>
+                        <div class="text-xs text-gray-500 flex items-center gap-1"><i class="ph ph-user text-gray-400"></i> ${e.creatorName || '-'}</div>
                     </td>
                     <td class="px-3 py-5 text-center">
                         <div class="text-xl font-bold text-gray-900 leading-none">${total}</div>
@@ -389,9 +399,26 @@
                         <div class="flex items-center gap-1.5"><i class="ph ph-clock-counter-clockwise text-gray-400"></i> Últ act: ${e.updatedAt.substring(0, 10)}</div>
                     </td>
                     <td class="px-3 py-5 text-center pr-6 relative">
-                        <button class="w-8 h-8 rounded-full border border-gray-200 text-gray-500 hover:text-black hover:border-black inline-flex items-center justify-center transition-colors shadow-sm bg-white" title="Acciones y Envío" onclick="alert('Funciones de Enviar Evaluación estarán en la Fase 11.')">
-                            <i class="ph ph-dots-three text-lg"></i>
-                        </button>
+                        <div class="relative inline-block text-left">
+                            <button onclick="toggleActionsMenu('menu-${e.id}')"
+                                class="w-8 h-8 rounded-full border border-gray-200 text-gray-500 hover:text-black hover:border-black inline-flex items-center justify-center transition-colors shadow-sm bg-white">
+                                <i class="ph ph-dots-three text-lg"></i>
+                            </button>
+                            <div id="menu-${e.id}"
+                                class="hidden absolute right-0 z-50 mt-2 w-52 origin-top-right rounded-xl bg-white shadow-lg border border-gray-200 py-1 focus:outline-none">
+                                <button onclick="openInviteModal('${e.id}', '${e.cargo.replace(/'/g, "\\'")}')"
+                                    class="flex items-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
+                                    <i class="ph ph-paper-plane-tilt text-gray-400"></i>
+                                    Enviar evaluación
+                                </button>
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <button onclick="archiveEvaluation('${e.id}', '${e.cargo.replace(/'/g, "\\'")}')"
+                                    class="flex items-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
+                                    <i class="ph ph-archive-box"></i>
+                                    Archivar evaluación
+                                </button>
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 `;
@@ -415,7 +442,7 @@
 
                 if (data.status === 'success' && data.data.profiles) {
                     data.data.profiles.forEach(p => {
-                        select.innerHTML += `<option value="${p.id}">${p.name} (${p.hierarchy}) - ${p.totalDurationMins} min</option>`;
+                        select.innerHTML += `<option value="${p.id}">${p.name} (${p.hierarchy || 'Sin jerarquía'}) - ${p.totalMinutes ?? 0} min</option>`;
                     });
                 }
             } catch (err) { }
@@ -479,7 +506,248 @@
             localStorage.removeItem('kokoro_client_token');
             window.location.href = '../../login.html';
         }
+
+        // ==========================
+        //  TAB SWITCHING
+        // ==========================
+        let currentTab = 'activas';
+        let allEvaluations = [];
+
+        function switchTab(tab) {
+            currentTab = tab;
+            const tabActivas = document.getElementById('tabActivas');
+            const tabArchivadas = document.getElementById('tabArchivadas');
+            if (tab === 'activas') {
+                tabActivas.className = 'px-6 py-2.5 text-sm font-bold rounded-full transition-all bg-black text-white shadow-sm';
+                tabArchivadas.className = 'px-6 py-2.5 text-sm font-bold text-gray-500 rounded-full transition-all hover:bg-gray-200';
+            } else {
+                tabArchivadas.className = 'px-6 py-2.5 text-sm font-bold rounded-full transition-all bg-black text-white shadow-sm';
+                tabActivas.className = 'px-6 py-2.5 text-sm font-bold text-gray-500 rounded-full transition-all hover:bg-gray-200';
+            }
+            const filtered = allEvaluations.filter(e => tab === 'activas' ? parseInt(e.archived) !== 1 : parseInt(e.archived) === 1);
+            renderEvaluations(filtered);
+        }
+
+        function filterTable() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#evalGrid tr[data-cargo]');
+            rows.forEach(row => {
+                const cargo = row.dataset.cargo || '';
+                const creator = row.dataset.creator || '';
+                const id = row.dataset.id || '';
+                row.style.display = (cargo.includes(q) || creator.includes(q) || id.includes(q)) ? '' : 'none';
+            });
+        }
+
+        // ==========================
+        //  DROPDOWN ACTIONS MENU
+        // ==========================
+        function toggleActionsMenu(menuId) {
+            // Close all open menus first
+            document.querySelectorAll('[id^="menu-"]').forEach(menu => {
+                if (menu.id !== menuId) menu.classList.add('hidden');
+            });
+            document.getElementById(menuId).classList.toggle('hidden');
+        }
+
+        // Close menus when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('[id^="menu-"]') && !e.target.closest('button[onclick^="toggleActionsMenu"]')) {
+                document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add('hidden'));
+            }
+        });
+
+        // ==========================
+        //  ARCHIVE EVALUATION
+        // ==========================
+        async function archiveEvaluation(evalId, cargo) {
+            if (!confirm(`¿Archivar la evaluación "${cargo}"? No se podrán enviar más invitaciones a esta evaluación.`)) return;
+            try {
+                const res = await fetch('../../../api/client/evaluations/archive.php', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ evaluationId: evalId })
+                });
+                const data = await res.json();
+                if (data.status === 'success' || data.success) {
+                    fetchEvaluations();
+                } else {
+                    alert(data.message || 'Error al archivar.');
+                }
+            } catch (err) {
+                alert('Error de conexión.');
+            }
+        }
+
+        // ==========================
+        //  INVITE MODAL
+        // ==========================
+        let _inviteEvalId = null;
+
+        function openInviteModal(evalId, cargo) {
+            _inviteEvalId = evalId;
+            document.getElementById('inviteModalTitle').textContent = `Invita postulantes a tu evaluación`;
+            document.getElementById('inviteSubtitle').textContent = cargo;
+            // Build link
+            const link = `${window.location.origin}/app_admin/public/candidate/test.html?token=${evalId}`;
+            document.getElementById('inviteLinkInput').value = link;
+            // Reset form
+            document.getElementById('inviteNombre').value = '';
+            document.getElementById('inviteApellido').value = '';
+            document.getElementById('inviteEmail').value = '';
+            document.getElementById('inviteModal').classList.remove('hidden');
+            // Close dropdown
+            document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add('hidden'));
+        }
+
+        function closeInviteModal() {
+            document.getElementById('inviteModal').classList.add('hidden');
+            _inviteEvalId = null;
+        }
+
+        async function sendEmailInvite() {
+            const nombre = document.getElementById('inviteNombre').value.trim();
+            const apellido = document.getElementById('inviteApellido').value.trim();
+            const email = document.getElementById('inviteEmail').value.trim();
+            if (!nombre || !email) { alert('Nombre y email son obligatorios.'); return; }
+
+            const btn = document.getElementById('btnSendInvite');
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+            try {
+                const res = await fetch('../../../api/client/candidates/invite.php', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ evaluationId: _inviteEvalId, firstName: nombre, lastName: apellido, email })
+                });
+                const data = await res.json();
+                if (data.status === 'success' || data.success) {
+                    document.getElementById('inviteNombre').value = '';
+                    document.getElementById('inviteApellido').value = '';
+                    document.getElementById('inviteEmail').value = '';
+                    btn.textContent = '✓ Invitado!';
+                    setTimeout(() => { btn.textContent = 'Invitar postulante'; btn.disabled = false; }, 2000);
+                } else {
+                    alert(data.message || 'Error al enviar invitación.');
+                    btn.disabled = false;
+                    btn.textContent = 'Invitar postulante';
+                }
+            } catch (e) {
+                alert('Error de conexión.'); btn.disabled = false; btn.textContent = 'Invitar postulante';
+            }
+        }
+
+        function copyInviteLink() {
+            const input = document.getElementById('inviteLinkInput');
+            navigator.clipboard.writeText(input.value).then(() => {
+                const btn = document.getElementById('btnCopyLink');
+                btn.textContent = '¡Copiado!';
+                setTimeout(() => btn.textContent = 'Copiar', 2000);
+            });
+        }
+
+        function shareWhatsApp() {
+            const link = document.getElementById('inviteLinkInput');
+            window.open(`https://wa.me/?text=${encodeURIComponent('Te invito a completar esta evaluación: ' + link.value)}`, '_blank');
+        }
     </script>
+
+    <!-- INVITE MODAL -->
+    <div id="inviteModal" class="relative z-[80] hidden" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm" onclick="closeInviteModal()"></div>
+        <div class="fixed inset-0 z-10 flex items-center justify-center p-4">
+            <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden">
+
+                <!-- Header -->
+                <div class="flex items-start justify-between px-8 py-6 border-b border-gray-100">
+                    <div>
+                        <h3 id="inviteModalTitle" class="text-xl font-bold text-gray-900 mb-0.5">Invita postulantes a tu
+                            evaluación</h3>
+                        <p id="inviteSubtitle" class="text-sm text-gray-500 font-medium"></p>
+                    </div>
+                    <button onclick="closeInviteModal()"
+                        class="ml-4 mt-1 w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors shrink-0">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+
+                    <!-- Left: Email Invite -->
+                    <div class="p-8">
+                        <h4 class="text-sm font-bold text-gray-900 mb-1">Invitación por correo</h4>
+                        <p class="text-xs text-gray-500 mb-5">Completa los datos para invitar por email.</p>
+                        <div class="space-y-3">
+                            <input id="inviteNombre" type="text" placeholder="Nombre"
+                                class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent placeholder-gray-400">
+                            <input id="inviteApellido" type="text" placeholder="Apellido"
+                                class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent placeholder-gray-400">
+                            <input id="inviteEmail" type="email" placeholder="Email"
+                                class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent placeholder-gray-400">
+                        </div>
+                        <button id="btnSendInvite" onclick="sendEmailInvite()"
+                            class="mt-5 w-full py-3.5 rounded-xl bg-[#1e293b] text-white text-sm font-bold hover:bg-black transition-colors">
+                            Invitar postulante
+                        </button>
+                        <p class="text-xs text-gray-400 text-center mt-3">Puedes editar el mensaje del correo en tu
+                            configuración.</p>
+                    </div>
+
+                    <!-- Right: Link / WhatsApp / Bulk -->
+                    <div class="p-8 space-y-7">
+
+                        <!-- Link -->
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-900 mb-1">Invitación por link</h4>
+                            <p class="text-xs text-gray-500 mb-3">Invita postulantes compartiendo el link de tu
+                                evaluación.</p>
+                            <div class="flex gap-2">
+                                <input id="inviteLinkInput" type="text" readonly
+                                    class="flex-1 min-w-0 border border-gray-200 rounded-xl px-3 py-2.5 text-xs text-gray-600 bg-gray-50 focus:outline-none truncate">
+                                <button id="btnCopyLink" onclick="copyInviteLink()"
+                                    class="shrink-0 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-100 transition-colors">
+                                    Copiar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- WhatsApp -->
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-900 mb-1">Invitación por WhatsApp</h4>
+                            <p class="text-xs text-gray-500 mb-3">Comparte el link directo en WhatsApp.</p>
+                            <button onclick="shareWhatsApp()"
+                                class="w-full py-3 rounded-xl bg-[#1e293b] text-white text-sm font-bold hover:bg-black transition-colors flex items-center justify-center gap-2">
+                                <i class="ph ph-whatsapp-logo text-lg"></i>
+                                Invitar por WhatsApp
+                            </button>
+                        </div>
+
+                        <!-- Bulk -->
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-900 mb-1">Invitación masiva</h4>
+                            <p class="text-xs text-gray-500 mb-3">Descarga nuestra plantilla y cárgala con tus
+                                postulantes.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <button
+                                    class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors">Cargar
+                                    plantilla</button>
+                                <button
+                                    class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors">Cargar
+                                    archivo</button>
+                                <button
+                                    class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors">Descargar
+                                    plantilla</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

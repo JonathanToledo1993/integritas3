@@ -4,325 +4,558 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crea Tu Prueba | Kokoro Empresas</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Crea Tu Prueba con IA | Kokoro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../../assets/css/style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        * {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            box-sizing: border-box;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 99px;
+        }
+
+        /* AI typing dots */
+        .typing-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #6b7280;
+            border-radius: 50%;
+            animation: typingBounce 1.2s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingBounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: .5;
+            }
+
+            30% {
+                transform: translateY(-6px);
+                opacity: 1;
+            }
+        }
+
+        /* Message animations */
+        .msg-row {
+            animation: msgIn 0.3s ease;
+        }
+
+        @keyframes msgIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Gradient border for AI avatar */
+        .ai-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Bundle card animation */
+        .bundle-card {
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Gradient AI accent */
+        .ai-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* Category chips */
+        .chip {
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        body {
+            height: 100vh;
+            overflow: hidden;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen flex">
+<body class="bg-[#f4f7f9] min-h-screen flex text-gray-900">
 
-    <!-- Sidebar Navigation -->
-    <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col h-screen sticky top-0">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col h-screen sticky top-0 shrink-0">
         <div class="h-16 flex items-center px-6 border-b border-gray-200 gap-3">
-            <div class="w-8 h-8 bg-black text-white font-bold rounded flex items-center justify-center text-sm">K</div>
-            <span class="font-semibold text-lg tracking-tight text-black">Kokoro Clientes</span>
+            <div class="w-8 h-8 bg-[#1e293b] text-white font-bold rounded flex items-center justify-center text-sm">K
+            </div>
+            <span class="font-bold text-lg tracking-tight text-[#1e293b]">Kokoro Clientes</span>
         </div>
-
         <div class="p-4 flex-1 overflow-y-auto">
             <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">Principal</div>
             <nav class="space-y-1 mb-8">
                 <a href="../evaluaciones/index.html"
-                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-black">
-                    <i class="ph ph-star text-lg"></i> Evaluaciones
-                </a>
+                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 hover:text-black transition-colors"><i
+                        class="ph ph-star text-lg"></i> Evaluaciones</a>
                 <a href="../index.html"
-                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-black">
-                    <i class="ph ph-squares-four text-lg"></i> Dashboard
-                </a>
+                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 hover:text-black transition-colors"><i
+                        class="ph ph-squares-four text-lg"></i> Dashboard</a>
                 <a href="../postulantes/index.html"
-                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-black">
-                    <i class="ph ph-users text-lg"></i> Postulantes
-                </a>
+                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 hover:text-black transition-colors"><i
+                        class="ph ph-users text-lg"></i> Postulantes</a>
                 <a href="../perfiles/index.html"
-                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-black">
-                    <i class="ph ph-briefcase text-lg"></i> Perfiles (Carpeta)
-                </a>
+                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 hover:text-black transition-colors"><i
+                        class="ph ph-briefcase text-lg"></i> Perfiles (Carpeta)</a>
             </nav>
-
             <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">Pruebas</div>
             <nav class="space-y-1 mb-8">
                 <a href="../biblioteca/index.html"
-                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-black">
-                    <i class="ph ph-books text-lg"></i> Biblioteca Kokoro
-                </a>
+                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 hover:text-black transition-colors"><i
+                        class="ph ph-books text-lg"></i> Biblioteca Kokoro</a>
                 <a href="index.html"
-                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium bg-gray-100 text-black rounded-md">
-                    <i class="ph ph-plus-circle text-lg"></i> Crea Tu Prueba
-                </a>
+                    class="flex items-center gap-3 px-3 py-3 text-sm font-medium bg-[#475569] text-white rounded-xl shadow-sm"><i
+                        class="ph ph-plus-circle text-lg"></i> Crea Tu Prueba</a>
                 <a href="../digitaliza/index.html"
-                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-black">
-                    <i class="ph ph-file-pdf text-lg"></i> Digitaliza Tu Prueba
-                </a>
+                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 hover:text-black transition-colors"><i
+                        class="ph ph-file-pdf text-lg"></i> Digitaliza Tu Prueba</a>
             </nav>
-
-            <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">AdministraciÃ³n</div>
+            <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">Administración</div>
             <nav class="space-y-1">
                 <a href="../configuracion/index.html"
-                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-black">
-                    <i class="ph ph-gear text-lg"></i> ConfiguraciÃ³n
-                </a>
+                    class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 hover:text-black transition-colors"><i
+                        class="ph ph-gear text-lg"></i> Configuración</a>
             </nav>
         </div>
-
-        <div class="border-t border-gray-200 p-4">
+        <div class="p-4 border-t border-gray-200">
             <button onclick="logout()"
-                class="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-red-600 rounded-md hover:bg-red-50 transition-colors">
-                <i class="ph ph-sign-out text-lg"></i> Cerrar SesiÃ³n
+                class="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors">
+                <i class="ph ph-sign-out text-lg"></i> Cerrar Sesión
             </button>
         </div>
     </aside>
 
-    <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col min-h-0 overflow-hidden">
+    <!-- Main 3-col layout -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden">
 
-        <!-- Mobile Header -->
-        <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 md:hidden">
-            <div class="font-bold flex items-center gap-2">
-                <div class="w-6 h-6 bg-black text-white rounded flex items-center justify-center text-xs">K</div>
-                Kokoro
+        <!-- Top bar -->
+        <header class="bg-white border-b border-gray-200 h-[72px] flex items-center justify-between px-8 shrink-0">
+            <div>
+                <div class="flex items-center gap-2 font-bold text-xl text-gray-900 mb-0.5">
+                    <div class="ai-gradient rounded-lg w-7 h-7 flex items-center justify-center">
+                        <i class="ph ph-sparkle text-white text-sm"></i>
+                    </div>
+                    Crea Tu Prueba con IA
+                </div>
+                <p class="text-xs text-gray-400 font-medium">Describe el cargo y Kokoro AI diseña la batería ideal</p>
             </div>
-            <button class="text-gray-500"><i class="ph ph-list text-2xl"></i></button>
+            <button onclick="resetChat()"
+                class="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+                <i class="ph ph-arrows-clockwise"></i> Nueva consulta
+            </button>
         </header>
 
-        <main class="flex-1 overflow-y-auto w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="md:flex md:items-center md:justify-between mb-8">
-                <div class="min-w-0 flex-1">
-                    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                        Crea Tu Prueba Ad-Hoc
-                    </h2>
-                    <p class="mt-2 text-sm text-gray-500">DiseÃ±a una evaluaciÃ³n tÃ©cnica o tÃ©cnica con banco de preguntas
-                        Ãºnico.</p>
+        <div class="flex-1 flex overflow-hidden">
+
+            <!-- LEFT: Chat panel -->
+            <div class="flex-1 flex flex-col overflow-hidden bg-white border-r border-gray-200">
+
+                <!-- Messages area -->
+                <div id="chatArea" class="flex-1 overflow-y-auto p-6 space-y-5">
+
+                    <!-- Welcome message -->
+                    <div class="msg-row flex items-start gap-3">
+                        <div class="ai-avatar"><i class="ph ph-sparkle text-white text-sm"></i></div>
+                        <div class="max-w-[75%]">
+                            <div class="text-xs font-semibold text-purple-600 mb-1.5">Kokoro AI</div>
+                            <div
+                                class="bg-gray-50 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700 leading-relaxed">
+                                <p class="mb-2">¡Hola! Soy <strong>Kokoro AI</strong>, tu asistente especializado en
+                                    reclutamiento y evaluación de talento. 🎯</p>
+                                <p class="mb-3">Puedo diseñar la batería de pruebas psicológicas y técnicas perfecta
+                                    para cualquier cargo. Solo necesito que me cuentes sobre el puesto que deseas
+                                    evaluar.</p>
+                                <p class="text-gray-500">¿Cuál es el cargo o área para la que buscas candidatos?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick prompts -->
+                    <div class="flex flex-wrap gap-2 pl-11">
+                        <button onclick="quickPrompt('Vendedor senior B2B con experiencia en tecnología')"
+                            class="px-3 py-1.5 rounded-full border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors">Vendedor
+                            B2B</button>
+                        <button onclick="quickPrompt('Gerente de operaciones logística y cadena de suministro')"
+                            class="px-3 py-1.5 rounded-full border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors">Gerente
+                            Operaciones</button>
+                        <button onclick="quickPrompt('Desarrollador de software full-stack con liderazgo de equipo')"
+                            class="px-3 py-1.5 rounded-full border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors">Dev
+                            Full-Stack</button>
+                        <button onclick="quickPrompt('Analista financiero senior para banca de inversión')"
+                            class="px-3 py-1.5 rounded-full border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors">Analista
+                            Financiero</button>
+                    </div>
+
+                </div>
+
+                <!-- Input area -->
+                <div class="p-4 bg-white border-t border-gray-200 shrink-0">
+                    <div
+                        class="flex items-end gap-3 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 focus-within:ring-2 focus-within:ring-purple-400 focus-within:border-purple-300 transition-all">
+                        <textarea id="aiInput" rows="1"
+                            placeholder="Describe el cargo, área, nivel jerárquico, número de candidatos..."
+                            oninput="autoResize(this)" onkeydown="handleKeyDown(event)"
+                            class="flex-1 bg-transparent text-sm text-gray-800 placeholder-gray-400 resize-none focus:outline-none min-h-[24px] max-h-[120px] leading-relaxed"></textarea>
+                        <button id="sendBtn" onclick="sendMessage()"
+                            class="ai-gradient w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0 hover:opacity-90 transition-opacity disabled:opacity-50">
+                            <i class="ph ph-paper-plane-tilt text-base"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-400 text-center mt-2">Presiona <kbd
+                            class="bg-gray-100 px-1 rounded text-[10px]">Shift+Enter</kbd> para nueva línea · <kbd
+                            class="bg-gray-100 px-1 rounded text-[10px]">Enter</kbd> para enviar</p>
                 </div>
             </div>
 
-            <!-- 2-Column Layout for AI Builder -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                <!-- Left Column: Chat AI -->
-                <div
-                    class="lg:col-span-2 bg-white shadow sm:rounded-lg overflow-hidden border border-gray-100 flex flex-col h-[600px]">
-                    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-                        <h3 class="text-base font-semibold leading-6 text-gray-900 flex items-center">
-                            <i class="ph ph-sparkle text-blue-500 mr-2 text-xl"></i> Asistente IA Kokoro
-                        </h3>
-                    </div>
-
-                    <!-- Chat Area -->
-                    <div id="chatArea" class="flex-1 p-6 overflow-y-auto space-y-4 bg-white">
-                        <!-- Initial Bot Message -->
-                        <div class="flex items-start gap-4">
-                            <div class="flex-shrink-0 bg-blue-100 rounded-full p-2">
-                                <i class="ph ph-robot text-blue-600 text-xl"></i>
-                            </div>
-                            <div class="bg-gray-50 rounded-lg p-4 max-w-[85%] text-sm text-gray-700">
-                                <p>Â¡Hola! Soy tu asistente de reclutamiento. Dime, <strong>Â¿quÃ© cargo deseas
-                                        evaluar?</strong> Puedes escribir el nombre del puesto o pegar la descripciÃ³n
-                                    completa de tu vacante para darte mejores recomendaciones.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Input Area -->
-                    <div class="p-4 bg-white border-t border-gray-100">
-                        <form id="aiForm" class="flex gap-3">
-                            <textarea id="aiInput" rows="2"
-                                class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                                placeholder="Escribe aquÃ­ (Ej. Desarrollador Frontend con react...)"></textarea>
-                            <button type="submit"
-                                class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 h-fit self-end transition-colors">
-                                <i class="ph ph-paper-plane-right mr-2"></i> Enviar
-                            </button>
-                        </form>
-                    </div>
+            <!-- RIGHT: Bundle preview panel -->
+            <div class="w-80 shrink-0 bg-[#f8f9fc] flex flex-col overflow-hidden">
+                <!-- Panel header -->
+                <div class="px-5 py-4 border-b border-gray-200 bg-white">
+                    <div class="text-sm font-bold text-gray-900 mb-0.5">Batería sugerida</div>
+                    <div class="text-xs text-gray-500">Kokoro AI generará tu propuesta aquí</div>
                 </div>
 
-                <!-- Right Column: My Test Bundle -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white shadow sm:rounded-lg overflow-hidden border border-gray-100 sticky top-6">
-                        <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-100">
-                            <h3 class="text-base font-semibold leading-6 text-gray-900">Mi Prueba Personalizada</h3>
-                            <p class="mt-1 max-w-2xl text-sm text-gray-500">Paquete sugerido por IA</p>
-                        </div>
-                        <div class="px-4 py-5 sm:p-6" id="bundleContainer">
-                            <div class="text-center py-10 text-gray-400">
-                                <i class="ph ph-cube text-4xl mb-2 text-gray-200"></i>
-                                <p class="text-sm">Chatea con Kokoro para generar tu primera propuesta.</p>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 px-4 py-4 sm:px-6 border-t border-gray-100" id="saveContainer"
-                            style="display: none;">
-                            <button type="button" onclick="saveAIBundle()" id="saveBtn"
-                                class="w-full inline-flex justify-center items-center rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 transition-colors">
-                                <i class="ph ph-floppy-disk mr-2"></i> Guardar y Usar Prueba
-                            </button>
-                        </div>
+                <!-- Empty state -->
+                <div id="bundleEmpty" class="flex-1 flex flex-col items-center justify-center text-center p-8">
+                    <div
+                        class="w-16 h-16 bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center mb-4">
+                        <i class="ph ph-brain text-3xl text-gray-300"></i>
                     </div>
+                    <p class="text-sm font-semibold text-gray-500 mb-1">Cuéntame sobre el cargo</p>
+                    <p class="text-xs text-gray-400">La IA analizará tus necesidades y recomendará la combinación óptima
+                        de pruebas.</p>
                 </div>
 
+                <!-- Bundle content (hidden initially) -->
+                <div id="bundleContent" class="hidden flex-1 overflow-y-auto p-5 space-y-4">
+                    <!-- Filled by JS -->
+                </div>
+
+                <!-- Save button area -->
+                <div id="saveArea" class="hidden p-4 border-t border-gray-200 bg-white">
+                    <button onclick="saveBundle()" id="saveBtn"
+                        class="w-full ai-gradient py-3.5 rounded-xl text-white text-sm font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                        <i class="ph ph-floppy-disk"></i> Guardar y usar esta batería
+                    </button>
+                    <button onclick="sendMessage('Ajusta las pruebas sugeridas')"
+                        class="w-full mt-2 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+                        Pedir ajustes
+                    </button>
+                </div>
             </div>
 
-        </main>
+        </div>
     </div>
 
-    <!-- Scripts -->
     <script>
         const token = localStorage.getItem('kokoro_client_token');
         if (!token) window.location.href = '../../login.html';
 
+        let conversationHistory = [];
         let currentBundle = null;
 
-        document.getElementById('aiForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // =====================
+        //  SEND MESSAGE
+        // =====================
+        async function sendMessage(overrideText) {
             const input = document.getElementById('aiInput');
-            const userText = input.value.trim();
-            if (!userText) return;
+            const text = overrideText || input.value.trim();
+            if (!text) return;
 
-            appendMessage('user', userText);
-            input.value = '';
+            if (!overrideText) input.value = '';
+            autoResize(input);
 
-            // Disable while loading
-            const btn = e.target.querySelector('button');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i>';
+            // Show user bubble
+            appendUserBubble(text);
+
+            // Show typing indicator
+            const typingId = showTyping();
+
+            // Disable send
+            document.getElementById('sendBtn').disabled = true;
 
             try {
                 const res = await fetch('../../../api/client/ai/recommend.php', {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ jobDescription: userText })
+                    body: JSON.stringify({ jobDescription: text, history: conversationHistory })
                 });
 
                 const data = await res.json();
 
+                removeTyping(typingId);
+
                 if (data.status === 'success') {
-                    currentBundle = data.data.recommendation;
+                    const reply = data.data.reply;
+                    const recommendation = data.data.recommendation;
 
-                    // Reply in chat
-                    let replyHTML = `<p class="mb-2">He analizado los requerimientos. Te sugiero un paquete compuesto por <strong>${currentBundle.tests.length} pruebas</strong> que tomarÃ­an alrededor de ${currentBundle.totalMins} minutos en total.</p>`;
-                    replyHTML += `<ul class="list-disc pl-4 space-y-1 mt-2">`;
-                    currentBundle.tests.forEach(t => {
-                        replyHTML += `<li><strong>${t.name}</strong>: <span class="text-gray-500">${t.reason}</span></li>`;
-                    });
-                    replyHTML += `</ul><p class="mt-3 text-xs text-blue-600 font-semibold">Revisa la tarjeta de la derecha para guardar tu nueva prueba.</p>`;
+                    // Add to history
+                    conversationHistory.push({ role: 'user', text });
+                    conversationHistory.push({ role: 'model', text: reply });
 
-                    appendMessage('bot', replyHTML);
-                    renderBundleCard();
+                    appendAIBubble(reply);
+
+                    if (recommendation) {
+                        currentBundle = recommendation;
+                        renderBundle(recommendation);
+                    }
                 } else {
-                    appendMessage('bot', `<span class="text-red-500">${data.message}</span>`);
+                    appendAIBubble(`<span class="text-red-500 font-medium">Error: ${data.message}</span>`);
                 }
             } catch (err) {
-                appendMessage('bot', `<span class="text-red-500">OcurriÃ³ un error conectando con el motor IA.</span>`);
+                removeTyping(typingId);
+                appendAIBubble(`<span class="text-red-500 font-medium">Error de conexión con la IA. Verifica tu conexión e intenta de nuevo.</span>`);
             } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="ph ph-paper-plane-right mr-2"></i> Enviar';
+                document.getElementById('sendBtn').disabled = false;
             }
-        });
-
-        function appendMessage(sender, textOrHtml) {
-            const chatBox = document.getElementById('chatArea');
-            const div = document.createElement('div');
-
-            if (sender === 'user') {
-                div.className = 'flex items-start gap-4 justify-end';
-                div.innerHTML = `
-                    <div class="bg-black text-white rounded-lg p-4 max-w-[85%] text-sm">
-                        <p>${textOrHtml.replace(/\n/g, '<br>')}</p>
-                    </div>
-                `;
-            } else {
-                div.className = 'flex items-start gap-4';
-                div.innerHTML = `
-                    <div class="flex-shrink-0 bg-blue-100 rounded-full p-2">
-                        <i class="ph ph-sparkle text-blue-600 text-xl"></i>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-4 max-w-[90%] text-sm text-gray-700 shadow-sm border border-blue-100">
-                        ${textOrHtml}
-                    </div>
-                `;
-            }
-
-            chatBox.appendChild(div);
-            // Scroll to bottom
-            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        function renderBundleCard() {
-            if (!currentBundle) return;
+        function quickPrompt(text) {
+            document.getElementById('aiInput').value = text;
+            sendMessage();
+        }
 
-            const container = document.getElementById('bundleContainer');
+        function handleKeyDown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
 
-            let html = `
-                <div>
-                    <h4 class="text-sm font-bold text-gray-900 mb-1">${currentBundle.bundleName}</h4>
-                    <p class="text-xs text-gray-500 mb-4">${currentBundle.description}</p>
-                    
-                    <div class="bg-blue-50 rounded p-3 flex items-center justify-between mb-4">
-                        <span class="text-xs font-semibold text-blue-800">DuraciÃ³n Aprox:</span>
-                        <span class="text-sm text-blue-900 font-bold">${currentBundle.totalMins} min</span>
+        function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+        }
+
+        // =====================
+        //  CHAT BUBBLES
+        // =====================
+        function appendUserBubble(text) {
+            const el = document.createElement('div');
+            el.className = 'msg-row flex justify-end';
+            el.innerHTML = `
+                <div class="max-w-[75%]">
+                    <div class="bg-[#1e293b] text-white rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(text)}</div>
+                </div>`;
+            scrollChat(el);
+        }
+
+        function appendAIBubble(html) {
+            const el = document.createElement('div');
+            el.className = 'msg-row flex items-start gap-3';
+            el.innerHTML = `
+                <div class="ai-avatar"><i class="ph ph-sparkle text-white text-sm"></i></div>
+                <div class="max-w-[80%]">
+                    <div class="text-xs font-semibold text-purple-600 mb-1.5">Kokoro AI</div>
+                    <div class="bg-gray-50 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700 leading-relaxed">${formatAIText(html)}</div>
+                </div>`;
+            scrollChat(el);
+        }
+
+        function showTyping() {
+            const id = 'typing_' + Date.now();
+            const el = document.createElement('div');
+            el.id = id;
+            el.className = 'msg-row flex items-start gap-3';
+            el.innerHTML = `
+                <div class="ai-avatar"><i class="ph ph-sparkle text-white text-sm"></i></div>
+                <div class="bg-gray-100 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3">
+                    <div class="flex items-center gap-1.5 h-4">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
                     </div>
+                </div>`;
+            scrollChat(el);
+            return id;
+        }
 
-                    <h5 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Pruebas Incluidas (${currentBundle.tests.length})</h5>
-                    <ul class="space-y-3">
+        function removeTyping(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function scrollChat(el) {
+            const chat = document.getElementById('chatArea');
+            chat.appendChild(el);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function formatAIText(text) {
+            // Convert markdown-like **bold** and line breaks
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n\n/g, '</p><p class="mt-2">')
+                .replace(/\n/g, '<br>');
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // =====================
+        //  BUNDLE RENDERING
+        // =====================
+        const categoryColors = {
+            'Personalidad': 'bg-purple-100 text-purple-700',
+            'Cognitivo': 'bg-blue-100 text-blue-700',
+            'Competencias': 'bg-emerald-100 text-emerald-700',
+            'Habilidades': 'bg-orange-100 text-orange-700',
+        };
+
+        function renderBundle(bundle) {
+            document.getElementById('bundleEmpty').classList.add('hidden');
+            document.getElementById('bundleContent').classList.remove('hidden');
+            document.getElementById('saveArea').classList.remove('hidden');
+
+            const container = document.getElementById('bundleContent');
+            let html = `
+                <div class="bundle-card bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
+                    <div class="flex items-start justify-between mb-2">
+                        <h4 class="text-sm font-bold text-gray-900 leading-tight pr-2">${bundle.bundleName}</h4>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-4 leading-relaxed">${bundle.description}</p>
+                    <div class="flex items-center justify-between bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl px-3 py-2.5 mb-4">
+                        <span class="text-xs font-bold text-purple-700">Duración total</span>
+                        <span class="text-sm font-extrabold text-purple-900">${bundle.totalMins} min</span>
+                    </div>
+                    <div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">${bundle.tests.length} prueba${bundle.tests.length > 1 ? 's' : ''} incluida${bundle.tests.length > 1 ? 's' : ''}</div>
+                    <div class="space-y-2.5">
             `;
 
-            currentBundle.tests.forEach((t, i) => {
+            bundle.tests.forEach((t, i) => {
+                const chip = categoryColors[t.category] || 'bg-gray-100 text-gray-600';
                 html += `
-                    <li class="flex items-start">
-                        <span class="flex items-center justify-center h-5 w-5 rounded-full bg-gray-200 text-xs font-bold text-gray-600 mt-0.5 mr-2 flex-shrink-0">${i + 1}</span>
-                        <div>
-                            <p class="text-sm font-medium text-gray-900 leading-tight">${t.name}</p>
+                    <div class="flex items-start gap-3 bg-gray-50 rounded-xl p-3 border border-gray-100">
+                        <div class="w-6 h-6 ai-gradient rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5">${i + 1}</div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 mb-0.5 flex-wrap">
+                                <span class="text-sm font-bold text-gray-900">${t.name}</span>
+                                <span class="chip ${chip}">${t.category || ''}</span>
+                            </div>
+                            <p class="text-xs text-gray-500 leading-relaxed">${t.reason}</p>
+                            <div class="text-xs font-semibold text-gray-400 mt-1">${t.durationMins} min</div>
                         </div>
-                    </li>
-                `;
+                    </div>`;
             });
 
-            html += `</ul></div>`;
+            html += `</div></div>`;
             container.innerHTML = html;
-            document.getElementById('saveContainer').style.display = 'block';
         }
 
-        async function saveAIBundle() {
+        // =====================
+        //  SAVE BUNDLE
+        // =====================
+        async function saveBundle() {
             if (!currentBundle) return;
-
             const btn = document.getElementById('saveBtn');
-            const originalText = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Guardando...';
 
             try {
-                // Map the frontend structure to the backend model expected
                 const payload = {
                     name: currentBundle.bundleName,
                     description: currentBundle.description,
                     isAiGenerated: 1,
                     totalDuration: currentBundle.totalMins,
-                    testKeys: currentBundle.tests // Guardo todo el arreglo de pruebas recomendadas como JSON
+                    testKeys: currentBundle.tests
                 };
-
                 const res = await fetch('../../../api/client/custom_tests/save.php', {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
                 const data = await res.json();
-
                 if (data.status === 'success') {
-                    // Success! Redirect to library Custom tab (simulated by going to standard lib for now until custom is added there)
-                    alert("Â¡Prueba creada con Ã©xito! Redirigiendo a tu Biblioteca...");
-                    window.location.href = '../biblioteca/index.html';
+                    appendAIBubble(`✅ <strong>¡Batería guardada exitosamente!</strong><br>La prueba "<strong>${currentBundle.bundleName}</strong>" ya está disponible en tu biblioteca. Puedes asignarla a una evaluación desde el menú de Evaluaciones.`);
+                    document.getElementById('saveArea').innerHTML = `<div class="p-3 text-center text-sm font-semibold text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-200">✓ Guardada en tu biblioteca</div>`;
+                    currentBundle = null;
                 } else {
-                    alert("Error: " + data.message);
+                    alert(data.message || 'Error guardando la prueba.');
                     btn.disabled = false;
-                    btn.innerHTML = originalText;
+                    btn.innerHTML = '<i class="ph ph-floppy-disk"></i> Guardar y usar esta batería';
                 }
-            } catch (err) {
-                alert("OcurriÃ³ un error al guardar.");
+            } catch (e) {
+                alert('Error de conexión.');
                 btn.disabled = false;
-                btn.innerHTML = originalText;
+                btn.innerHTML = '<i class="ph ph-floppy-disk"></i> Guardar y usar esta batería';
             }
+        }
+
+        // =====================
+        //  RESET
+        // =====================
+        function resetChat() {
+            conversationHistory = [];
+            currentBundle = null;
+            document.getElementById('chatArea').innerHTML = `
+                <div class="msg-row flex items-start gap-3">
+                    <div class="ai-avatar"><i class="ph ph-sparkle text-white text-sm"></i></div>
+                    <div class="max-w-[75%]">
+                        <div class="text-xs font-semibold text-purple-600 mb-1.5">Kokoro AI</div>
+                        <div class="bg-gray-50 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700 leading-relaxed">
+                            <p>¡Listo para una nueva consulta! 🎯 ¿Sobre qué cargo deseas diseñar una evaluación ahora?</p>
+                        </div>
+                    </div>
+                </div>`;
+            document.getElementById('bundleEmpty').classList.remove('hidden');
+            document.getElementById('bundleContent').classList.add('hidden');
+            document.getElementById('saveArea').classList.add('hidden');
         }
 
         function logout() {

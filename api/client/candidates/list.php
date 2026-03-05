@@ -1,5 +1,6 @@
 <?php
 // api/client/candidates/list.php
+// Lista todos los candidatos invitados a evaluaciones de esta empresa.
 require_once '../../config/db.php';
 require_once '../../utils/auth_middleware.php';
 
@@ -9,30 +10,43 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     Responder::error("Método no permitido. Use GET.", 405);
 }
 
-// Proteger la ruta
 $clientData = AuthMiddleware::requireClient();
 $companyId = $clientData['companyId'];
 
 try {
-    // Actualmente las invitaciones MOCK se guardan en evaluation_invites 
-    // y no tienen relación con la empresa en la BD mock actual (solo email y token).
-    // Idealmente deberían unirse a una tabla "evaluations -> companyId".
-    // 
-    // Para propósitos visuales de Dashboard, sacaremos las invitaciones genéricas por ahora,
-    // o agregaremos una columna ficticia si el schema fallase, pero ajustaremos a la lógica
-    // de la DB de la Fase 4:
-
     $sql = "
-        SELECT id, name, email, token, expiresAt, usedAt, createdAt 
-        FROM evaluation_invites 
-        ORDER BY createdAt DESC
+        SELECT
+            c.id                                            AS candidateId,
+            c.firstName,
+            c.lastName,
+            c.email,
+            ec.id                                          AS evalCandidateId,
+            ec.status,
+            ec.secureToken                                 AS inviteToken,
+            ec.scoreGlobal,
+            ec.completedAt,
+            ec.createdAt                                   AS invitedAt,
+            e.id                                           AS evaluationId,
+            e.cargo                                        AS evaluationCargo,
+            e.expiresAt,
+            u.name                                         AS invitedByName,
+            (
+                SELECT COUNT(*)
+                FROM evaluation_candidates ec2
+                WHERE ec2.candidateId = c.id
+                  AND ec2.status = 'COMPLETED'
+            )                                              AS totalFinalizadas
+        FROM candidates c
+        JOIN evaluation_candidates ec ON ec.candidateId = c.id
+        JOIN evaluations e            ON ec.evaluationId = e.id
+        LEFT JOIN users u             ON e.creatorId = u.id
+        WHERE c.companyId = ?
+        ORDER BY ec.createdAt DESC
     ";
 
-    // NOTA: Si esta tabla crece, debería filtrarse por creador o compañía. 
-    // En el schema original `evaluation_invites` no tiehe FK. Lo dejamos genérico como mock.
-
-    $stmt = $pdo->query($sql);
-    $candidates = $stmt->fetchAll();
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$companyId]);
+    $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     Responder::success([
         "candidates" => $candidates
@@ -40,6 +54,6 @@ try {
 
 }
 catch (Exception $e) {
-    Responder::error("Error del servidor obteniendo postulantes.", 500);
+    Responder::error("Error obteniendo postulantes: " . $e->getMessage(), 500);
 }
 ?>

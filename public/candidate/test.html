@@ -4,123 +4,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desarrollando Test...</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Acceder a Evaluación | Kokoro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-[#f4f7f9] min-h-screen flex flex-col items-center justify-center p-4">
 
-    <header class="bg-black text-white h-14 flex items-center justify-between px-6 shadow">
-        <div class="font-bold flex items-center gap-2">
-            <div class="bg-white text-black px-2 rounded font-black">K</div> Evaluaciones
-        </div>
-        <div class="text-sm font-mono text-gray-300">
-            Tiempo Invertido: <span id="timerText">00:00</span>
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 h-14 flex items-center px-6 z-10">
+        <div class="font-bold flex items-center gap-2 text-gray-900">
+            <div class="w-7 h-7 bg-[#1e293b] text-white rounded flex items-center justify-center text-sm font-black">K
+            </div>
+            Kokoro Evaluaciones
         </div>
     </header>
 
-    <main class="flex-1 w-full max-w-3xl mx-auto py-10 px-4" id="testContainer">
-        <!-- Progress Bar -->
-        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-8">
-            <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%" id="pBar"></div>
-        </div>
+    <!-- STEP 1: Registration Form -->
+    <div id="stepRegister" class="w-full max-w-md mt-14 fade-in">
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-200 p-8">
+            <div class="mb-7 text-center">
+                <div class="w-14 h-14 bg-[#f0f4ff] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="ph ph-clipboard-text text-[#3b5bdb] text-2xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-1">Accede a tu evaluación</h1>
+                <p class="text-sm text-gray-500">Ingresa tus datos para comenzar el proceso de evaluación.</p>
+            </div>
 
-        <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200 text-center">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Nombre *</label>
+                    <input id="regFirstName" type="text" placeholder="Tu nombre"
+                        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black placeholder-gray-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Apellido</label>
+                    <input id="regLastName" type="text" placeholder="Tu apellido"
+                        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black placeholder-gray-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Correo
+                        electrónico *</label>
+                    <input id="regEmail" type="email" placeholder="tu@email.com"
+                        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black placeholder-gray-400">
+                </div>
+            </div>
 
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Módulo de Resolución</h2>
+            <button id="btnStartEval" onclick="registerAndStart()"
+                class="mt-6 w-full py-3.5 rounded-xl bg-[#1e293b] text-white text-sm font-bold hover:bg-black transition-colors flex items-center justify-center gap-2">
+                <i class="ph ph-arrow-right"></i>
+                Comenzar evaluación
+            </button>
 
-            <p class="text-gray-600 mb-8" id="qText">
-                ¿Qué comportamiento consideras más importante en un entorno de alta fricción laboral?
+            <p class="text-xs text-gray-400 text-center mt-4">
+                Tus datos son confidenciales y solo serán utilizados por la empresa evaluadora.
             </p>
+        </div>
+    </div>
 
-            <div class="space-y-3" id="ansBox">
-                <button
-                    class="w-full text-left p-4 border rounded hover:border-black hover:bg-gray-50 transition-colors focus:ring-2 focus:ring-black focus:outline-none">
-                    A) Delegar y observar.
-                </button>
-                <button
-                    class="w-full text-left p-4 border rounded hover:border-black hover:bg-gray-50 transition-colors focus:ring-2 focus:ring-black focus:outline-none">
-                    B) Enfrentar frontalmente y mediar.
-                </button>
+    <!-- STEP 2: Test UI -->
+    <div id="stepTest" class="hidden w-full max-w-3xl mt-14 fade-in">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: 45%" id="pBar"></div>
             </div>
-
-            <!-- Botonera de flujo simulada para la demostración -->
-            <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
-                <button id="nextBtn"
-                    class="bg-black text-white px-6 py-2 rounded font-medium hover:bg-gray-800 transition shadow">
-                    Siguiente Pregunta
-                </button>
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Módulo de Evaluación</h2>
+            <p class="text-gray-600 mb-8">La evaluación asignada está en proceso de configuración por la empresa. Pronto
+                podrás completarla aquí.</p>
+            <div class="text-sm text-gray-400 font-mono bg-gray-50 rounded-lg p-3 mb-6">
+                Token: <span id="tokenDisplay" class="font-bold text-gray-600"></span>
+            </div>
+            <div class="border-t border-gray-100 pt-6">
+                <p class="text-sm text-gray-500">¿Tienes dudas? Contacta a la empresa que te invitó.</p>
             </div>
         </div>
-    </main>
+    </div>
 
-    <main class="flex-1 w-full max-w-3xl mx-auto py-10 px-4 hidden" id="successContainer">
-        <div class="bg-white p-12 rounded-lg shadow-sm border border-gray-200 text-center">
-            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
-                <!-- SVG Check -->
-                <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
+    <!-- STEP 3: Error -->
+    <div id="stepError" class="hidden w-full max-w-md mt-14 fade-in">
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-200 p-8 text-center">
+            <div class="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="ph ph-warning text-red-500 text-2xl"></i>
             </div>
-            <h2 class="text-3xl font-extrabold text-gray-900 mb-2">¡Prueba Finalizada!</h2>
-            <p class="text-gray-600 mb-6">Tus respuestas han sido procesadas de forma segura y han sido entregadas al
-                reclutador.</p>
-            <p class="text-sm text-gray-400">Ya puedes cerrar esta pestaña y salir del navegador.</p>
+            <h2 class="text-xl font-bold text-gray-900 mb-2">Link inválido</h2>
+            <p id="errorMsg" class="text-sm text-gray-500">Este link de evaluación no es válido o ya expiró.</p>
         </div>
-    </main>
-
+    </div>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
+        // The link shared can contain either the evaluationId or a secureToken
+        const evalToken = urlParams.get('token'); // evaluationId used in direct links
+        const secureToken = urlParams.get('st');  // secureToken from email invite
 
-        if (!token) window.location.href = "index.html";
+        if (!evalToken && !secureToken) {
+            showError('No se encontró un token de evaluación en el link.');
+        }
 
-        // Cronómetro UI
-        let s = 0;
-        setInterval(() => {
-            s++;
-            let m = Math.floor(s / 60).toString().padStart(2, '0');
-            let secs = (s % 60).toString().padStart(2, '0');
-            document.getElementById('timerText').textContent = `${m}:${secs}`;
-        }, 1000);
+        // If candidate was already registered via email (has secureToken), skip form
+        if (secureToken) {
+            document.getElementById('stepRegister').classList.add('hidden');
+            document.getElementById('stepTest').classList.remove('hidden');
+            document.getElementById('tokenDisplay').textContent = secureToken;
+        }
 
-        // Envío Falso a API Submit
-        document.getElementById('nextBtn').addEventListener('click', async () => {
+        async function registerAndStart() {
+            const firstName = document.getElementById('regFirstName').value.trim();
+            const lastName = document.getElementById('regLastName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
 
-            const btn = document.getElementById('nextBtn');
-            btn.textContent = "Procesando...";
+            if (!firstName || !email) {
+                alert('Nombre y correo electrónico son obligatorios.');
+                return;
+            }
+
+            const btn = document.getElementById('btnStartEval');
             btn.disabled = true;
+            btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Registrando...';
 
             try {
-                // Post API Guardado (Quema el token)
-                const res = await fetch('../../api/candidate/submit.php', {
+                const res = await fetch('../../api/public/candidate/register.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token, answers: [{ q: 1, a: "B" }] })
+                    body: JSON.stringify({ evaluationId: evalToken, firstName, lastName, email })
                 });
-
                 const data = await res.json();
 
-                if (!res.ok || !data.success) {
-                    alert("Error guardando el examen: " + data.error);
-                    btn.textContent = "Re-intentar";
+                if (data.status === 'success') {
+                    // Registered - proceed to test
+                    document.getElementById('stepRegister').classList.add('hidden');
+                    document.getElementById('stepTest').classList.remove('hidden');
+                    document.getElementById('tokenDisplay').textContent = data.data.secureToken;
+                } else {
+                    alert(data.message || 'Error al registrarte.');
                     btn.disabled = false;
-                    return;
+                    btn.innerHTML = '<i class="ph ph-arrow-right"></i> Comenzar evaluación';
                 }
-
-                // Show Success Template
-                document.getElementById('testContainer').classList.add('hidden');
-                document.getElementById('successContainer').classList.remove('hidden');
-
             } catch (e) {
-                alert("Error de Red.");
+                alert('Error de conexión. Intenta nuevamente.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ph ph-arrow-right"></i> Comenzar evaluación';
             }
-        });
+        }
 
+        function showError(msg) {
+            document.getElementById('stepRegister').classList.add('hidden');
+            document.getElementById('stepTest').classList.add('hidden');
+            document.getElementById('stepError').classList.remove('hidden');
+            document.getElementById('errorMsg').textContent = msg;
+        }
     </script>
+
 </body>
 
 </html>
