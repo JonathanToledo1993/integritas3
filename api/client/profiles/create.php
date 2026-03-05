@@ -34,7 +34,7 @@ try {
 
     // Insertar Perfil Maestro
     $sql = "
-        INSERT INTO profiles (id, companyId, name, hierarchy, area, testKeys, totalDurationMins, creatorId, createdAt, updatedAt)
+        INSERT INTO profiles (id, companyId, name, hierarchy, area, testKeys, totalMinutes, creatorId, createdAt, updatedAt)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
     ";
 
