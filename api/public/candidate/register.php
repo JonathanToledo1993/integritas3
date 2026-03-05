@@ -9,6 +9,11 @@ header("Content-Type: application/json; charset=UTF-8");
 
 require_once '../../config/db.php';
 
+if (isset($_GET['diag'])) {
+    file_put_contents('diag.txt', 'OK - ' . date('Y-m-d H:i:s'));
+    die(json_encode(["diag" => "written", "content" => file_get_contents('diag.txt')]));
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
