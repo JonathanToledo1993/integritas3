@@ -19,6 +19,7 @@ try {
         SELECT 
             e.id,
             e.cargo,
+            e.profileKey,
             p.name as profileName,
             p.testKeys,
             e.language,
@@ -44,7 +45,23 @@ try {
 
     // 2. OBTENER DETALLE DE LAS PRUEBAS (CATÁLOGO)
     $testsAssigned = [];
-    if (!empty($evaluation['testKeys'])) {
+    $profileKey = $evaluation['profileKey'] ?? '';
+
+    // Intento 1: Buscar por tabla pivot (cuando el perfil fue creado desde el UI)
+    if (!empty($profileKey)) {
+        $sqlPivot = "
+            SELECT ct.id, ct.`key`, ct.name, ct.description, ct.durationMins 
+            FROM profile_tests pt
+            INNER JOIN catalog_tests ct ON pt.testId = ct.id
+            WHERE pt.profileId = ?
+        ";
+        $stmtPivot = $pdo->prepare($sqlPivot);
+        $stmtPivot->execute([$profileKey]);
+        $testsAssigned = $stmtPivot->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Intento 2: Compatibilidad hacia atrás para leer desde el JSON testKeys de profiles
+    if (empty($testsAssigned) && !empty($evaluation['testKeys'])) {
         $keys = json_decode($evaluation['testKeys'], true);
         if (is_array($keys) && count($keys) > 0) {
             $placeholders = implode(',', array_fill(0, count($keys), '?'));
@@ -54,6 +71,7 @@ try {
             $testsAssigned = $stmtTests->fetchAll(PDO::FETCH_ASSOC);
         }
     }
+
     $evaluation['tests'] = $testsAssigned;
     unset($evaluation['testKeys']); // Limpiamos la prop sin procesar
 
