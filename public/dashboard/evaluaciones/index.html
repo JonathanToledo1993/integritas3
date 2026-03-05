@@ -406,6 +406,11 @@
                             </button>
                             <div id="menu-${e.id}"
                                 class="hidden absolute right-0 z-50 mt-2 w-52 origin-top-right rounded-xl bg-white shadow-lg border border-gray-200 py-1 focus:outline-none">
+                                <a href="ver_evaluacion.html?id=${e.id}"
+                                    class="flex items-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black transition-colors text-left">
+                                    <i class="ph ph-folder-open text-gray-400"></i>
+                                    Abrir evaluación
+                                </a>
                                 <button onclick="openInviteModal('${e.id}', '${e.cargo.replace(/'/g, "\\'")}')"
                                     class="flex items-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
                                     <i class="ph ph-paper-plane-tilt text-gray-400"></i>
